@@ -1,74 +1,109 @@
+<div align="center">
+
+
 # CM-EVS
 
-This repository contains the code release for **CM-EVS: Conflict-Minimized Efficient View Selection for Scalable 3D Scene Data Acquisition**.
+### Conflict-Minimized Efficient View Selection for Scalable 3D Scene Data Acquisition
 
-- **Company website:** <https://www.aniverse.net.cn/>
-- **GitHub organization:** <https://github.com/Strange-animalss>
-- **Hugging Face:** <https://huggingface.co/anon-cmevs-2026> (code and datasets)
+<p>
+  <a href="https://github.com/Strange-animalss"><img src="https://img.shields.io/badge/GitHub-Strange--animalss-181717?logo=github&logoColor=white" alt="GitHub"></a>
+  <a href="https://huggingface.co/anon-cmevs-2026"><img src="https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-anon--cmevs--2026-FFD21E" alt="Hugging Face"></a>
+  <a href="https://www.aniverse.net.cn/"><img src="https://img.shields.io/badge/Website-aniverse.net.cn-2962FF" alt="Website"></a>
+  <a href="#-license"><img src="https://img.shields.io/badge/License-MIT-green.svg" alt="License: MIT"></a>
+  <img src="https://img.shields.io/badge/python-3.10%2B-blue" alt="Python 3.10+">
+</p>
 
-The release is intentionally organized around one primary review path:
+
+<p><em>A scalable pipeline for curating panoramic RGB-D datasets — generate candidate viewpoints, greedily pick the smallest set that covers a 3D scene, and render high-quality ERP frames under a unified schema.</em></p>
+
+</div>
+
+---
+
+## ✨ Highlights
+
+- **🎯 Conflict-minimized view selection.** A greedy selector that trades raw coverage gain against pairwise viewpoint conflict, yielding fewer-but-better frames per scene.
+- **🌐 Source-agnostic.** One unified ERP RGB + range-depth + pose schema across Blender indoor (`.blend`), HM3D / generic GLB, ScanNet++ PLY, and outdoor sources.
+- **🔁 Reproducible end-to-end.** Single-command smoke test, dry-run, and full-scene runs — all metadata (candidates, per-step log, selected viewpoints) emitted to disk.
+- **🤝 License-aware companion dataset.** Redistributable Blender indoor frames + adapter-only packages for restricted sources, MLCommons Croissant manifest included.
+- **🧩 Modular core.** ERP projection, tangent-plane extraction, depth, and warping live in small, swappable modules under `core/`.
+
+---
+
+## 🔗 Links
+
+<table>
+<tr>
+  <td>🐙 <b>GitHub organization</b></td>
+  <td><a href="https://github.com/Strange-animalss">github.com/Strange-animalss</a></td>
+</tr>
+<tr>
+  <td>🤗 <b>Hugging Face</b> (code &amp; datasets)</td>
+  <td><a href="https://huggingface.co/anon-cmevs-2026">huggingface.co/anon-cmevs-2026</a></td>
+</tr>
+<tr>
+  <td>🌐 <b>Company website</b></td>
+  <td><a href="https://www.aniverse.net.cn/">aniverse.net.cn</a></td>
+</tr>
+</table>
+
+
+---
+
+## 📦 Pipeline Overview
 
 ```text
 Blender indoor .blend scenes
-  -> candidate generation
-  -> conflict-minimized view selection
-  -> selected ERP rendering
-  -> coverage, oracle-gap, and quality-audit outputs
+   │
+   ▼
+ candidate generation  ──►  conflict-minimized view selection  ──►  selected ERP rendering
+                                                                            │
+                                                                            ▼
+                                                    coverage  •  oracle-gap  •  quality audit
 ```
 
-HM3D/GLB and ScanNet++/PLY support is included as secondary adapters, but the first path reviewers should inspect is the Blender-indoor path.
+HM3D / GLB and ScanNet++ / PLY are supported as secondary adapters; the **Blender-indoor path is the recommended first route for reviewers**.
 
-## Review-Ready Entry Points
+---
 
-| Purpose                      | Command                                                      |
-| ---------------------------- | ------------------------------------------------------------ |
-| No-data smoke test           | `bash scripts/run_tiny.sh`                                   |
-| Blender-indoor dry run       | `DRY_RUN=1 BLENDER=/path/to/blender INPUT_DIR=/path/to/blend_scenes bash scripts/run_blender_indoor.sh` |
-| Full Blender-indoor run      | `BLENDER=/path/to/blender INPUT_DIR=/path/to/blend_scenes bash scripts/run_blender_indoor.sh` |
-| Summarize Blender-indoor run | `python3 scripts/summarize_blender_indoor_run.py --output-root outputs/blender_indoor` |
-| Anonymity check              | `bash scripts/check_anonymity.sh`                            |
+## 🚀 Review-Ready Entry Points
 
-The smoke test is designed to run without private assets. The full Blender-indoor run requires local `.blend` scenes and a Blender executable.
+| Purpose                   | Command                                                      |
+| :------------------------ | :----------------------------------------------------------- |
+| 🧪 No-data smoke test      | `bash scripts/run_tiny.sh`                                   |
+| 🔍 Blender-indoor dry run  | `DRY_RUN=1 BLENDER=/path/to/blender INPUT_DIR=/path/to/blend_scenes bash scripts/run_blender_indoor.sh` |
+| 🏃 Full Blender-indoor run | `BLENDER=/path/to/blender INPUT_DIR=/path/to/blend_scenes bash scripts/run_blender_indoor.sh` |
+| 📊 Summarize a run         | `python3 scripts/summarize_blender_indoor_run.py --output-root outputs/blender_indoor` |
+| 🕵️ Anonymity check         | `bash scripts/check_anonymity.sh`                            |
 
-## Repository Layout
+> The smoke test runs without any private assets. The full Blender-indoor run requires local `.blend` scenes and a Blender executable.
 
-```text
-.
-├── pipelines/               # full scene pipelines; Blender indoor is the primary path
-├── scripts/                 # review and reproduction entry points
-├── configs/                 # default and source-specific configs
-├── core/                    # ERP projection, tangent extraction, depth, and warping modules
-├── tools/                   # semantic and navigability helpers
-├── utils/                   # IO and pose utilities
-├── examples/                # tiny Blender-indoor-style metadata example
-├── metadata_examples/       # JSON schemas for candidate/selection logs
-├── data/                    # local data mount point, not tracked
-├── third_party/             # optional external dependencies, not tracked
-└── results/                 # generated result CSVs
-```
+---
 
-## Environment
+## 🛠️ Installation
 
 ```bash
+# Option A — Conda
 conda env create -f environment.yml
 conda activate cmevs
-```
 
-If Conda is unavailable:
-
-```bash
+# Option B — venv + pip
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-## Minimal Smoke Test
+---
+
+## ⚡ Minimal Smoke Test
 
 ```bash
 bash scripts/run_tiny.sh
 ```
 
-Expected outputs:
+<details>
+<summary><b>Expected outputs</b></summary>
+
 
 ```text
 outputs/tiny/metadata/candidates.jsonl
@@ -80,17 +115,17 @@ outputs/tiny/results/oracle_validation.csv
 outputs/tiny/results/audit_50_frames.csv
 ```
 
-This test validates the repository wiring and metadata contracts. It is not intended to reproduce paper-scale numbers.
+</details>
 
-## Paper Experiments
+This test validates the repository wiring and metadata contracts — it is **not** intended to reproduce paper-scale numbers.
 
-The driver scripts for the §6 evaluation experiments (fixed-budget coverage, oracle-gain validation, λ sweep, cross-source robustness, downstream depth) are scheduled to be released alongside the camera-ready paper. The current release ships the algorithmic core (`scripts/build_candidates.py`, `scripts/select_views.py`, `scripts/render_selected.py`), the per-stage evaluation building blocks (`scripts/evaluate_coverage.py`, `scripts/evaluate_oracle_gap.py`, `scripts/audit_quality.py`), and the metadata-contract example through the smoke test. Reviewers can verify the algorithmic core end-to-end via the smoke test above.
+---
 
-## Primary Full Run: Blender Indoor
+## 🏗️ Primary Full Run: Blender Indoor
 
 Put `.blend` scenes under `data/blender_indoor/`, or point `INPUT_DIR` to another directory. Nested layouts are supported; the first subdirectory under `INPUT_DIR` is used as the scene name.
 
-Dry run:
+**Dry run:**
 
 ```bash
 DRY_RUN=1 \
@@ -100,7 +135,7 @@ OUTPUT_ROOT=outputs/blender_indoor \
 bash scripts/run_blender_indoor.sh
 ```
 
-Full run:
+**Full run:**
 
 ```bash
 BLENDER=/path/to/blender \
@@ -111,7 +146,9 @@ RESOLUTION=2048,1024 \
 bash scripts/run_blender_indoor.sh
 ```
 
-Equivalent direct CLI:
+<details>
+<summary><b>Equivalent direct CLI</b></summary>
+
 
 ```bash
 export PYTHONPATH="$PWD:$PWD/pipelines:${PYTHONPATH:-}"
@@ -127,46 +164,119 @@ python3 pipelines/run_full_pipeline.py \
   --stop-gain 0.08
 ```
 
-## Secondary Adapters
+</details>
 
-The repository also includes adapters for additional sources used in robustness analyses:
+---
 
-- `configs/blender_outdoor.yaml`: generic `.glb` / `.gltf` scenes.
-- `configs/hm3d.yaml`: HM3D-style `.glb` / `.gltf` scenes.
-- `configs/scannetpp.yaml`: ScanNet++-style `.ply` scenes.
+## 🔌 Secondary Adapters
 
-These adapters are provided for completeness, but the Blender-indoor route is the recommended first reviewer path.
+| Adapter         | Source format    | Config                         |
+| :-------------- | :--------------- | :----------------------------- |
+| Blender outdoor | `.glb` / `.gltf` | `configs/blender_outdoor.yaml` |
+| HM3D            | `.glb` / `.gltf` | `configs/hm3d.yaml`            |
+| ScanNet++       | `.ply`           | `configs/scannetpp.yaml`       |
 
-## Data and Checkpoints
+These adapters are provided for completeness and robustness analyses; the Blender-indoor route remains the recommended first reviewer path.
 
-This repository does not redistribute third-party scene assets, dataset files, or model checkpoints. Put local assets under `data/` or pass absolute paths via CLI. The `data/` directory is ignored by git.
+---
 
-Depth Pro is optional for ERPT-style depth fusion. If used, place it under:
+## 📁 Repository Layout
+
+```text
+.
+├── pipelines/          # full scene pipelines; Blender indoor is the primary path
+├── scripts/            # review and reproduction entry points
+├── configs/            # default and source-specific configs
+├── core/               # ERP projection, tangent extraction, depth, warping
+├── tools/              # semantic and navigability helpers
+├── utils/              # IO and pose utilities
+├── examples/           # tiny Blender-indoor-style metadata example
+├── metadata_examples/  # JSON schemas for candidate/selection logs
+├── data/               # local data mount point (not tracked)
+├── third_party/        # optional external dependencies (not tracked)
+└── results/            # generated result CSVs
+```
+
+---
+
+## 📂 Data & Checkpoints
+
+This repository does **not** redistribute third-party scene assets, dataset files, or model checkpoints. Put local assets under `data/` or pass absolute paths via CLI. The `data/` directory is gitignored.
+
+**Optional — Depth Pro** for ERPT-style depth fusion:
 
 ```text
 third_party/ml-depth-pro/
 third_party/ml-depth-pro/checkpoints/depth_pro.pt
 ```
 
-## Companion Dataset
+---
+
+## 🤗 Companion Dataset
 
 The CM-EVS dataset is released on Hugging Face alongside this code repository:
 
-> **Dataset:** [`huggingface.co/datasets/anon-cmevs-2026/cmevs-erp-eval`](https://huggingface.co/datasets/anon-cmevs-2026/cmevs-erp-eval)
+> 📂 **Dataset:** [`huggingface.co/datasets/anon-cmevs-2026/cmevs-erp-eval`](https://huggingface.co/datasets/anon-cmevs-2026/cmevs-erp-eval)
 >
-> **Hugging Face namespace (code and datasets):** <https://huggingface.co/anon-cmevs-2026>
+> 🏷️ **Namespace** (code & datasets): <https://huggingface.co/anon-cmevs-2026>
 
-**What's in it.** A coverage-curated panoramic RGB-D dataset built under the principle *maximize the geometric coverage of a 3D scene with the fewest ERP frames possible*. The v1.0 release stages **13,631 ERP RGB-depth-pose frames across 374 Blender indoor scenes** (CC-BY 4.0, redistributable), plus four license-aware adapter packages — HM3D, ScanNet++, OB3D, TartanGround — that regenerate matched frames locally from upstream sources whose terms forbid redistribution.
+### What's in it
 
-**Unified schema.** Every frame ships as a triple — `panorama_{NNNN}.png` (2048×1024 ERP RGB), `panorama_{NNNN}_depth.npy` (float32 range depth in metres; NaN/0 for invalid pixels), and `pose_{NNNN}.json` (scalar-first quaternion `q_wc = [w, x, y, z]` plus position relative to the scene's first selected frame) — under a single right-handed `+X` right / `+Y` up / `+Z` forward world frame and OpenCV camera convention. The same schema applies to the Blender indoor drop and to all four adapter-regenerated sources.
+A coverage-curated panoramic RGB-D dataset built under the principle *maximize the geometric coverage of a 3D scene with the fewest ERP frames possible*.
 
-**Reviewer quick sample.** The full Blender indoor archive is ~109 GB. For reviewer-time inspection without a full download, scene [`sence_indoor_0001`](https://huggingface.co/datasets/anon-cmevs-2026/cmevs-erp-eval/tree/main/blender_indoor/scenes/sence_indoor_0001) (33 panoramas + 33 depth arrays + 33 pose files, ~250 MB) is provided as a representative sample produced by the exact same end-to-end pipeline as the rest of the release.
+| Source                 | License       | Released          | Scale                          |
+| :--------------------- | :------------ | :---------------- | :----------------------------- |
+| **Blender indoor**     | CC-BY 4.0     | 📦 Full RGB-D data | **374 scenes · 13,631 frames** |
+| HM3D                   | upstream EULA | 🔧 Adapter only    | 401 rooms (regen)              |
+| ScanNet++              | upstream ToS  | 🔧 Adapter only    | 500 scans (regen)              |
+| OB3D (outdoor)         | upstream      | 🔧 Adapter only    | 24 (regen)                     |
+| TartanGround (outdoor) | upstream      | 🔧 Adapter only    | 762 parts (regen)              |
 
-**Licensing.** Blender indoor frames are CC-BY 4.0. The four restricted sources ship adapter scripts + metadata only — users obtain upstream data themselves and regenerate matching frames locally. See the dataset card's `LICENSE.md` for the per-component matrix.
+### Unified schema
+
+Each ERP frame ships as a triple under a single right-handed `+X` right / `+Y` up / `+Z` forward world frame (OpenCV camera convention):
+
+| File                        | Format         | Description                                |
+| :-------------------------- | :------------- | :----------------------------------------- |
+| `panorama_{NNNN}.png`       | PNG, 2048×1024 | ERP RGB image                              |
+| `panorama_{NNNN}_depth.npy` | float32        | Range depth (m); NaN/0 invalid             |
+| `pose_{NNNN}.json`          | JSON           | scalar-first `q_wc = [w,x,y,z]` + position |
+
+### Reviewer quick sample
+
+The full Blender-indoor archive is ~109 GB. For reviewer-time inspection without a full download, [`sence_indoor_0001`](https://huggingface.co/datasets/anon-cmevs-2026/cmevs-erp-eval/tree/main/blender_indoor/scenes/sence_indoor_0001) (~250 MB; 33 panoramas + 33 depth arrays + 33 poses) is provided as a representative sample produced by the exact same end-to-end pipeline as the rest of the release.
 
 The dataset card also includes the Datasheet (Gebru et al. 2021), integrity-verification commands (`shasum -a 256 -c SHA256SUMS`), and the MLCommons Croissant v1.0 manifest. The Croissant manifest under `dataset_metadata/croissant.json` in this repository mirrors the dataset's metadata at release time.
 
-## Final Submission Check
+---
+
+## 📊 Results
+
+> 🚧 **Numbers below are placeholders.** The §6 evaluation experiments (fixed-budget coverage, oracle-gain validation, λ sweep, cross-source robustness, downstream depth) are still in flight. The final tables will be filled alongside the camera-ready paper release.
+
+| Experiment              | Setting                                          | Primary metric        | Result |
+| :---------------------- | :----------------------------------------------- | :-------------------- | :----: |
+| Fixed-budget coverage   | 374-scene Blender indoor, *K* = 30 frames/scene  | Coverage @ *K*        | `TBD`  |
+| Oracle-gain validation  | Greedy vs. oracle upper bound                    | Gain ratio            | `TBD`  |
+| λ sweep                 | Conflict weight λ ∈ {0.0, …, 1.0}                | Coverage vs. conflict | `TBD`  |
+| Cross-source robustness | Blender / HM3D / ScanNet++ / OB3D / TartanGround | Per-source coverage   | `TBD`  |
+| Downstream depth        | Panoramic depth on 94-scene subset               | δ₁ / AbsRel           | `TBD`  |
+
+---
+
+## 🧪 Paper Experiments
+
+The driver scripts for the §6 evaluation experiments — *fixed-budget coverage*, *oracle-gain validation*, *λ sweep*, *cross-source robustness*, *downstream depth* — are scheduled to be released alongside the camera-ready paper.
+
+The current release ships:
+
+- 🧠 **Algorithmic core** — `scripts/build_candidates.py`, `scripts/select_views.py`, `scripts/render_selected.py`
+- 📐 **Per-stage evaluation building blocks** — `scripts/evaluate_coverage.py`, `scripts/evaluate_oracle_gap.py`, `scripts/audit_quality.py`
+- 📋 **Metadata-contract example** — verifiable end-to-end via the smoke test above
+
+---
+
+## ✅ Final Submission Check
 
 Before uploading the code URL or zip:
 
@@ -176,10 +286,15 @@ rm -rf outputs
 bash scripts/check_anonymity.sh
 ```
 
-The code is released under the MIT License for review. Dataset assets remain governed by their original licenses.
+---
 
-## Links
+## 📜 License
 
-- **Company website:** <https://www.aniverse.net.cn/>
-- **GitHub organization:** <https://github.com/Strange-animalss>
-- **Hugging Face:** <https://huggingface.co/anon-cmevs-2026> (code and datasets)
+Code is released under the **MIT License** for review. Dataset assets remain governed by their original licenses — see `LICENSE.md` in the dataset card for the per-component matrix.
+
+---
+
+<div align="center">
+<sub>Maintained by the <a href="https://github.com/Strange-animalss">Strange-animalss</a> organization · <a href="https://www.aniverse.net.cn/">aniverse.net.cn</a></sub>
+</div>
+
