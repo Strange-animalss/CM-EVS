@@ -150,13 +150,21 @@ third_party/ml-depth-pro/checkpoints/depth_pro.pt
 
 ## Companion Dataset
 
-The CM-EVS dataset (Blender indoor RGB-D panoramas, license-aware adapters for HM3D / ScanNet++ / OB3D / TartanGround, MLCommons Croissant metadata) is released on Hugging Face:
+The CM-EVS dataset is released on Hugging Face alongside this code repository:
 
 > **Dataset:** [`huggingface.co/datasets/anon-cmevs-2026/cmevs-erp-eval`](https://huggingface.co/datasets/anon-cmevs-2026/cmevs-erp-eval)
 >
 > **Hugging Face namespace (code and datasets):** <https://huggingface.co/anon-cmevs-2026>
 
-The dataset card on that page includes the Datasheet, integrity-verification commands (`shasum -a 256 -c SHA256SUMS`), and the per-component license matrix. The Croissant manifest under `dataset_metadata/croissant.json` in this repository mirrors the dataset's metadata at release time.
+**What's in it.** A coverage-curated panoramic RGB-D dataset built under the principle *maximize the geometric coverage of a 3D scene with the fewest ERP frames possible*. The v1.0 release stages **13,631 ERP RGB-depth-pose frames across 374 Blender indoor scenes** (CC-BY 4.0, redistributable), plus four license-aware adapter packages — HM3D, ScanNet++, OB3D, TartanGround — that regenerate matched frames locally from upstream sources whose terms forbid redistribution.
+
+**Unified schema.** Every frame ships as a triple — `panorama_{NNNN}.png` (2048×1024 ERP RGB), `panorama_{NNNN}_depth.npy` (float32 range depth in metres; NaN/0 for invalid pixels), and `pose_{NNNN}.json` (scalar-first quaternion `q_wc = [w, x, y, z]` plus position relative to the scene's first selected frame) — under a single right-handed `+X` right / `+Y` up / `+Z` forward world frame and OpenCV camera convention. The same schema applies to the Blender indoor drop and to all four adapter-regenerated sources.
+
+**Reviewer quick sample.** The full Blender indoor archive is ~109 GB. For reviewer-time inspection without a full download, scene [`sence_indoor_0001`](https://huggingface.co/datasets/anon-cmevs-2026/cmevs-erp-eval/tree/main/blender_indoor/scenes/sence_indoor_0001) (33 panoramas + 33 depth arrays + 33 pose files, ~250 MB) is provided as a representative sample produced by the exact same end-to-end pipeline as the rest of the release.
+
+**Licensing.** Blender indoor frames are CC-BY 4.0. The four restricted sources ship adapter scripts + metadata only — users obtain upstream data themselves and regenerate matching frames locally. See the dataset card's `LICENSE.md` for the per-component matrix.
+
+The dataset card also includes the Datasheet (Gebru et al. 2021), integrity-verification commands (`shasum -a 256 -c SHA256SUMS`), and the MLCommons Croissant v1.0 manifest. The Croissant manifest under `dataset_metadata/croissant.json` in this repository mirrors the dataset's metadata at release time.
 
 ## Final Submission Check
 
