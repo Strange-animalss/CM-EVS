@@ -3,7 +3,7 @@
 
 # CM-EVS
 
-### Conflict-Minimized Efficient View Selection for Scalable 3D Scene Data Acquisition
+### Sparse Panoramic RGB-D-Pose Data for Complete Scene Coverage
 
 <p>
   <a href="https://github.com/Strange-animalss"><img src="https://img.shields.io/badge/GitHub-Strange--animalss-181717?logo=github&logoColor=white" alt="GitHub"></a>
